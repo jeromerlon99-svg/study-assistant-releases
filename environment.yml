@@ -1,0 +1,30 @@
+name: study-assistant
+
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  # Runtime foundations. JavaScript and Rust packages use native lock files;
+  # Python ranges live in pyproject.toml and the Windows resolution is pinned
+  # in requirements-lock.txt.
+  - python=3.12
+  - pip>=25,<27
+  - nodejs=24
+  - pnpm>=10,<12
+  - ffmpeg>=7,<9
+  - sqlite>=3.45
+  - ca-certificates
+  - certifi
+  - openssl
+  - pip:
+      # Python application, test, and packaging dependencies are declared in
+      # pyproject.toml and installed into this same isolated environment.
+      - -c requirements-lock.txt
+      - -e ./services/agent[dev,build]
+
+# Windows system prerequisites intentionally live outside Conda:
+# - Microsoft Visual C++ Build Tools with Desktop development with C++
+# - Windows 10/11 SDK
+# - Rust stable toolchain for x86_64-pc-windows-msvc
+# - Microsoft Edge WebView2 Runtime
