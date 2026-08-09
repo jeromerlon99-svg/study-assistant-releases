@@ -25,6 +25,15 @@
 - 本地 Python 可编辑包元数据已由 0.1.5 对齐到 0.1.7。
 - 未生成安装包；原有 `preview-builds/0.1.7/` 预览文件保留。
 
+## 0.1.7 可分发安装包
+
+- 发布命令升级为 `pnpm release:build`：依次构建 Python sidecar、准备经 SHA-256 校验的 BtbN FFmpeg 8.1 LGPL x64 静态运行文件，并生成 NSIS 单文件安装器。
+- 安装版在不依赖 Conda、Python 或系统 FFmpeg 的环境 PATH 下通过 Agent `/health` 检查；返回版本 0.1.7、`ffmpeg: true`，本地转写与语义检索运行库可用。
+- 已验证 NSIS `/D=` 指定安装目录、完整文件落盘和静默卸载；临时安装目录与卸载记录已清理。
+- 最终安装包输出到项目外：`Documents/StudyAssistant-Release/0.1.7/Study Assistant_0.1.7_x64-setup.exe`。
+- 最终大小：191,466,430 bytes；SHA-256：`99D172F09D398BFCB40ECBEC297BCC99D1D68910E28F1660CC511C4ADFDD5C82`。
+- 当前未使用 Authenticode 代码签名，其他电脑上的 Windows SmartScreen 可能显示未知发布者提示。
+
 ## 0.1.7 完成内容
 
 - 移除尚未投入使用的视频抽帧、视觉模型配置和视觉能力状态；课程理解继续基于网页元数据、字幕或本地音轨转写。

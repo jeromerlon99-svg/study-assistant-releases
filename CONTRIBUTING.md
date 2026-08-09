@@ -49,6 +49,8 @@ ignored frontend bundle to `apps/desktop/dist/`.
 `VERSION` is the source of truth. Update all application manifests together and
 run `pnpm check:version`. A normal quality check does not generate an installer.
 Only use `pnpm release:build` when a release package is explicitly required.
+That command also downloads and verifies the pinned LGPL FFmpeg Windows runtime
+when it is not already present in `development-artifacts/ffmpeg/`.
 
 Never commit API keys, `runtime-data/`, generated executables, model weights, or
 personal course material. Do not rewrite or delete user data while preparing a

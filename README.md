@@ -147,16 +147,15 @@ pnpm check
 ### 构建发布版
 
 ```powershell
-pnpm sidecar:build
-pnpm tauri build --no-bundle
+pnpm release:build
 ```
 
-第一步把 Python Agent 打包为 Tauri sidecar，临时构建文件会写入可删除的 `development-artifacts/pyinstaller/`。0.1.7 不带安装器的便携开发预览位于：
+该命令会依次打包 Python Agent、下载并校验固定 SHA-256 的 LGPL FFmpeg/FFprobe Windows 运行文件，再生成单文件 NSIS 安装器。临时构建文件统一写入可删除的 `development-artifacts/`。0.1.7 不带安装器的便携开发预览位于：
 
 - `preview-builds/0.1.7/study-assistant.exe`
 - `preview-builds/0.1.7/study-assistant-agent.exe`
 
-生成 NSIS 安装器时运行 `pnpm tauri build`。
+只重新生成 NSIS 安装器时可运行 `pnpm tauri build`，但必须确保 sidecar 和 FFmpeg 运行文件已经由前述完整发布命令准备好。
 
 ## 数据位置
 

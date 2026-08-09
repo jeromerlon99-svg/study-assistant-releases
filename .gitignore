@@ -28,5 +28,7 @@ dist/
 target/
 apps/desktop/src-tauri/gen/
 apps/desktop/src-tauri/binaries/*.exe
+apps/desktop/src-tauri/binaries/ffmpeg-LICENSE.txt
+apps/desktop/src-tauri/binaries/THIRD_PARTY_NOTICES.md
 !apps/desktop/src-tauri/binaries/.gitkeep
 services/agent/*.egg-info/

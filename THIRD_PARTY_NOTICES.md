@@ -30,3 +30,20 @@ When a course has no readable subtitles, the user may select a compatible
 faster-whisper model for local transcription. Model artifacts are downloaded to
 `runtime-data/models/faster-whisper/` on demand and retain the license and usage
 terms published with the selected model.
+
+## FFmpeg 8.1
+
+The Windows installer includes the separate `ffmpeg.exe` and `ffprobe.exe`
+programs from the BtbN FFmpeg Windows x64 LGPL 8.1 static build. Study Assistant
+invokes these programs as separate processes for public-course media inspection
+and audio extraction; it does not link against FFmpeg libraries.
+
+- Upstream project: [`FFmpeg`](https://ffmpeg.org/)
+- Windows build project: [`BtbN/FFmpeg-Builds`](https://github.com/BtbN/FFmpeg-Builds)
+- Build asset: `ffmpeg-n8.1-latest-win64-lgpl-8.1.zip`
+- Verified archive SHA-256: `9e7ba6e147252b33458786a3c1c2c9b337d21da1ad53f5d98b1e98d9711e1a5b`
+- License: GNU Lesser General Public License as supplied in the build archive
+
+The installer includes the build archive's `LICENSE.txt`. Corresponding FFmpeg
+source and reproducible build scripts are available from the upstream and build
+project links above. The bundled executables are unmodified.

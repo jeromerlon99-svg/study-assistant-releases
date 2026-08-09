@@ -258,11 +258,16 @@ fn configure_agent_log(command: &mut Command, data_dir: &Path) {
 fn spawn_agent(token: &str, port: u16) -> Result<Child, String> {
     let root = project_root();
     let data_dir = runtime_data_dir();
-    let mut command = if !cfg!(debug_assertions) {
-        packaged_agent_executable().map(Command::new)
+    let packaged_agent = if !cfg!(debug_assertions) {
+        packaged_agent_executable()
     } else {
         None
     };
+    let packaged_binary_dir = packaged_agent
+        .as_ref()
+        .and_then(|path| path.parent())
+        .map(Path::to_path_buf);
+    let mut command = packaged_agent.map(Command::new);
     if command.is_none() {
         let source_path = root.join("services").join("agent").join("src");
         let existing_python_path = std::env::var_os("PYTHONPATH").unwrap_or_default();
@@ -286,6 +291,15 @@ fn spawn_agent(token: &str, port: u16) -> Result<Child, String> {
         command = Some(python);
     }
     let mut command = command.expect("Agent command must be configured");
+    if let Some(binary_dir) = packaged_binary_dir {
+        let mut search_paths = vec![binary_dir];
+        if let Some(existing_path) = std::env::var_os("PATH") {
+            search_paths.extend(std::env::split_paths(&existing_path));
+        }
+        if let Ok(path) = std::env::join_paths(search_paths) {
+            command.env("PATH", path);
+        }
+    }
     command
         .env("STUDY_ASSISTANT_HOST", "127.0.0.1")
         .env("STUDY_ASSISTANT_PORT", port.to_string())
