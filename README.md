@@ -8,6 +8,9 @@
 >
 > The automatically generated **Source code (zip)** and **Source code (tar.gz)**
 > archives contain only this README and do not contain the application source code.
+>
+> “直心是道场，无虚伪故” --《维摩诘经》
+> 愿我们真诚
 
 ---
 
