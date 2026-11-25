@@ -1,0 +1,17 @@
+{
+  "bundle": {
+    "active": true,
+    "externalBin": [
+      "binaries/study-assistant-agent",
+      "binaries/ffmpeg",
+      "binaries/ffprobe"
+    ],
+    "resources": [
+      "binaries/ffmpeg-LICENSE.txt",
+      "binaries/ffmpeg-build.txt",
+      "binaries/PyAV-LICENSE.txt",
+      "binaries/PyAV-build.txt",
+      "binaries/THIRD_PARTY_NOTICES.md"
+    ]
+  }
+}

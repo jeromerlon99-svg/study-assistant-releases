@@ -54,6 +54,11 @@ try {
         throw "PyInstaller failed with exit code $LASTEXITCODE"
     }
 
+    conda run -n $CondaEnvironment python scripts/collect-pyav-notices.py $binaryDirectory
+    if ($LASTEXITCODE -ne 0) {
+        throw "Could not collect the PyAV license and native library build information."
+    }
+
     Copy-Item -LiteralPath (Join-Path $distribution "study-assistant-agent.exe") -Destination $target -Force
     Write-Output "Sidecar ready: $target"
 }

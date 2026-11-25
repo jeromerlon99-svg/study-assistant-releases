@@ -2,6 +2,8 @@
 
 Study Assistant 是一个 Windows 桌面学习助手。它接收公开课网址，先检查网页、视频、字幕和模型能力，再读取字幕或在本地转写音频，将课程重构为带时间戳的“速学速记”，并在独立对话区优先依据课程内容回答问题。
 
+源码公开供查阅，可按 [LICENSE](LICENSE) 在本机编译和试用。Windows 安装包、校验值及使用教程通过 GitHub Releases 分发。安装包用户无需配置开发环境。
+
 ## 0.1.7 已实现
 
 - 移除尚未投入使用的视频抽帧、视觉模型设置和视觉能力状态，不再让不可用的预留选项占用界面。
@@ -58,7 +60,7 @@ Study Assistant 是一个 Windows 桌面学习助手。它接收公开课网址�
 - 使用固定的课程学习提示词，先生成全课详细内容介绍，再按模块整理核心知识、讲解路线、例子、速记卡、易错点与自测；结果可追溯到课程时间戳并导出 Markdown。
 - 问答使用当前任务的课程记录，并在课程没有覆盖时由当前文本模型的内部知识补充；两者必须明确区分。
 - 每个任务独立保存课程来源、转写、速学笔记、对话和状态；添加网址时明确选择“新任务”或“继续旧任务”。任务管理支持重命名、用已有转写重新生成速学笔记和永久删除。
-- Tauri 主窗口、独立课程问答 UI、系统托盘，以及 420×88 始终置顶运行状态浮窗。
+- Tauri 主窗口、独立课程问答 UI、系统托盘，以及始终置顶的桌面电子宠物。
 - 中断恢复：应用重启后，未完成任务会进入 `PAUSED`，可人工继续；开发进度记录在 `docs/DEVELOPMENT_CHECKPOINT.md`。
 - 所有 API Key 只保存在当前运行进程的内存中；应用启动时清空，并删除旧版本曾写入操作系统凭据库的 Key。
 - 主窗口左下角和任务标题栏都提供 API 设置入口。未填写本次运行的 Key、或连接测试未通过时，开始记录、重新生成和提问会被明确拦截，不再静默生成基础摘录并标记成功。
@@ -78,10 +80,8 @@ Study Assistant 是一个 Windows 桌面学习助手。它接收公开课网址�
 ```powershell
 conda env create -f environment.yml
 conda activate study-assistant
-pnpm install
+pnpm install --frozen-lockfile
 ```
-
-本机已经创建并验证了 `study-assistant` 环境。若终端是在 Rust 安装前打开的，请重新打开 PowerShell。
 
 ### 开发运行
 
@@ -90,7 +90,7 @@ conda activate study-assistant
 pnpm tauri dev
 ```
 
-Tauri 会自动启动本地 Agent；若首选端口 `8765` 被占用，会选择一个空闲的本机端口。浏览器单独调试前端时，可分别运行：
+Tauri 开发模式直接启动 Conda 环境中的 Python Agent，使用开发环境提供的 FFmpeg。若首选端口 `8765` 被占用，会选择一个空闲的本机端口。浏览器单独调试前端时，可分别运行：
 
 ```powershell
 pnpm agent:dev
@@ -150,12 +150,9 @@ pnpm check
 pnpm release:build
 ```
 
-该命令会依次打包 Python Agent、下载并校验固定 SHA-256 的 LGPL FFmpeg/FFprobe Windows 运行文件，再生成单文件 NSIS 安装器。临时构建文件统一写入可删除的 `development-artifacts/`。0.1.7 不带安装器的便携开发预览位于：
+该命令会依次打包 Python Agent、下载并校验固定版本的 LGPL FFmpeg/FFprobe，再传入发布专用配置生成单文件 NSIS 安装器。安装包位于 `apps/desktop/src-tauri/target/release/bundle/nsis/`（如果设置了 `CARGO_TARGET_DIR`，则在对应的目标目录下）。发布到 GitHub 时将 EXE 和教程添加为 Release 附件。
 
-- `preview-builds/0.1.7/study-assistant.exe`
-- `preview-builds/0.1.7/study-assistant-agent.exe`
-
-只重新生成 NSIS 安装器时可运行 `pnpm tauri build`，但必须确保 sidecar 和 FFmpeg 运行文件已经由前述完整发布命令准备好。
+如果固定的 FFmpeg 构建在上游下架，可以将同名、同 SHA-256 的原始 ZIP 放入 `development-artifacts/ffmpeg/` 后重试。更新构建版本时，须同步更新校验值和 [第三方声明](THIRD_PARTY_NOTICES.md)。
 
 ## 数据位置
 
@@ -173,6 +170,6 @@ pnpm release:build
 
 删除单个学习任务时，会删除该任务的数据库记录、媒体缓存、对应导出文件和语义索引，但不会删除可供其他任务复用的 faster-whisper 或 E5 模型。API Key 不写入上述任何文件，也不写入系统凭据库或日志。
 
-早期开发版采用 `%LOCALAPPDATA%\StudyAssistant`，原因是 AppData 是 Windows 应用保存可写运行数据的标准位置，能够避免程序升级覆盖数据并适配安装目录不可写的情况。按本项目当前的集中存放要求，已有数据已经迁移到 `runtime-data\`，旧目录已移除。
+早期开发版曾使用 `%LOCALAPPDATA%\StudyAssistant`。当前版本默认使用上面的 `runtime-data\` 规则。
 
 架构与状态机详见 [docs/ARCHITECTURE_ZH.md](./docs/ARCHITECTURE_ZH.md)，当前开发断点见 [docs/DEVELOPMENT_CHECKPOINT.md](./docs/DEVELOPMENT_CHECKPOINT.md)。

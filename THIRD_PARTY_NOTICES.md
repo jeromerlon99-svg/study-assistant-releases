@@ -31,7 +31,7 @@ faster-whisper model for local transcription. Model artifacts are downloaded to
 `runtime-data/models/faster-whisper/` on demand and retain the license and usage
 terms published with the selected model.
 
-## FFmpeg 8.1
+## FFmpeg and FFprobe command-line programs
 
 The Windows installer includes the separate `ffmpeg.exe` and `ffprobe.exe`
 programs from the BtbN FFmpeg Windows x64 LGPL 8.1 static build. Study Assistant
@@ -39,11 +39,29 @@ invokes these programs as separate processes for public-course media inspection
 and audio extraction; it does not link against FFmpeg libraries.
 
 - Upstream project: [`FFmpeg`](https://ffmpeg.org/)
-- Windows build project: [`BtbN/FFmpeg-Builds`](https://github.com/BtbN/FFmpeg-Builds)
-- Build asset: `ffmpeg-n8.1-latest-win64-lgpl-8.1.zip`
-- Verified archive SHA-256: `9e7ba6e147252b33458786a3c1c2c9b337d21da1ad53f5d98b1e98d9711e1a5b`
+- Build release and asset: [`autobuild-2026-11-24-12-41`](https://github.com/FFmpeg-Builds/FFmpeg-Builds/releases/tag/autobuild-2026-11-24-12-41),
+  `ffmpeg-n8.1.3-41-ga8029b6528-win64-lgpl-8.1.zip`
+- Archive SHA-256: `2201df4d6cbdcbbda9e612645605735821bb4cd0b120a9683f970c4c4e2de8e4`
+- Corresponding upstream FFmpeg revision: [`a8029b6528`](https://github.com/FFmpeg/FFmpeg/tree/a8029b6528).
+  The release tag also identifies the [build recipes](https://github.com/FFmpeg-Builds/FFmpeg-Builds/tree/autobuild-2026-11-24-12-41).
 - License: GNU Lesser General Public License as supplied in the build archive
 
-The installer includes the build archive's `LICENSE.txt`. Corresponding FFmpeg
-source and reproducible build scripts are available from the upstream and build
-project links above. The bundled executables are unmodified.
+New builds include the archive's license and the actual configure line in
+`ffmpeg-build.txt`. The bundled executables are unmodified.
+
+The previously distributed August 2026 installer uses
+`n8.1.2-34-g9b6c8969e0-20260809`, whose
+[upstream FFmpeg revision is `9b6c8969e0`](https://github.com/FFmpeg/FFmpeg/tree/9b6c8969e05b4f0b29f0f85cd501be6b3e582e6b).
+Its input archive SHA-256 is
+`9e7ba6e147252b33458786a3c1c2c9b337d21da1ad53f5d98b1e98d9711e1a5b`.
+
+## PyAV and its native libraries
+
+The Python sidecar uses [PyAV 18.0.0](https://pypi.org/project/av/18.0.0/),
+licensed under BSD-3-Clause, to decode audio for faster-whisper. Its Windows
+wheel ships native libraries, including a separate build of FFmpeg 8.1.2.
+See the [PyAV source and build scripts](https://github.com/PyAV-Org/PyAV/tree/v18.0.0)
+and the [FFmpeg 8.1.2 source](https://github.com/FFmpeg/FFmpeg/tree/n8.1.2).
+New builds include the PyAV license and `PyAV-build.txt`, which records the
+wheel's DLL inventory and the FFmpeg libraries' reported version, license, and
+configuration. The native libraries retain their own licenses.

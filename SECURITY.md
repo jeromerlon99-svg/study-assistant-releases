@@ -1,6 +1,6 @@
 # Security policy
 
-Study Assistant is a local, private application. Report suspected security or
+Study Assistant runs its Agent locally. Report suspected security or
 privacy issues directly to the project owner; do not publish databases, logs,
 course media, transcripts, API keys, or screenshots containing private data.
 
@@ -15,5 +15,7 @@ course media, transcripts, API keys, or screenshots containing private data.
 - Downloaded transcription and semantic models remain local under
   `runtime-data/models/`.
 
-Before sharing diagnostic material, remove authorization headers, URLs with
-tokens, course content, absolute personal paths, and database or model files.
+The Agent omits HTTP access logs because event-stream URLs contain a local
+session token. Before sharing older logs or other diagnostic material, remove
+authorization headers, `/events?token=…` URLs, course content, absolute personal
+paths, and database or model files.

@@ -61,17 +61,8 @@
     ]
   },
   "bundle": {
-    "active": true,
+    "active": false,
     "targets": ["nsis"],
-    "externalBin": [
-      "binaries/study-assistant-agent",
-      "binaries/ffmpeg",
-      "binaries/ffprobe"
-    ],
-    "resources": [
-      "binaries/ffmpeg-LICENSE.txt",
-      "binaries/THIRD_PARTY_NOTICES.md"
-    ],
     "shortDescription": "AI assistant for public courses and grounded notes",
     "longDescription": "Study Assistant watches accessible public courses, creates timestamped notes, and answers questions with course-first evidence.",
     "icon": [

@@ -13,6 +13,8 @@ def main() -> None:
         host=settings.host,
         port=settings.port,
         log_level=settings.log_level.lower(),
+        # EventSource authenticates using a query parameter on its URL.
+        access_log=False,
         reload=False,
     )
 

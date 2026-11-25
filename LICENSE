@@ -1,9 +1,12 @@
 Copyright (c) 2026 Study Assistant. All rights reserved.
 
-This source code and the Study Assistant application are proprietary and
-confidential. No permission is granted to copy, modify, publish, distribute,
-sublicense, sell, or create derivative works from this project except with the
-prior written authorization of the copyright holder.
+The published Study Assistant source code is available for inspection. You may
+view and fork this repository on GitHub under the GitHub Terms of Service.
+You may also download, build, and run the source locally for personal
+evaluation. All other rights in the Study Assistant code, branding, artwork,
+and documentation remain reserved. Modification, redistribution outside the
+GitHub permissions above, sublicensing, and commercial reuse require prior
+written permission from the copyright holder.
 
 Third-party libraries, tools, fonts, media, and model artifacts remain subject
 to their respective licenses. See THIRD_PARTY_NOTICES.md and the dependency

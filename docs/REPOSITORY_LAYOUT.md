@@ -10,6 +10,7 @@
 | `runtime-data/` | User database, course media, models, exports, and logs | No |
 | `development-artifacts/` | Disposable test/build reports, caches, and temporary files | No |
 | `preview-builds/` | Local portable preview executables | No |
+| `output/`, `tmp/` | Local release attachments and temporary work | No |
 | `node_modules/` | Restored JavaScript dependencies | No |
 
 The physical working folder may contain both source and ignored local state. A
