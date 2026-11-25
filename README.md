@@ -1,69 +1,46 @@
-# Study Assistant 0.1.7
+# Study Assistant
 
-Study Assistant 是一个 Windows 桌面学习助手。它接收公开课网址，先检查网页、视频、字幕和模型能力，再读取字幕或在本地转写音频，将课程重构为带时间戳的“速学速记”，并在独立对话区优先依据课程内容回答问题。
+[中文](#中文) · [English](#english) · [Deutsch](#deutsch) · [开发与构建](#开发环境)
 
-源码公开供查阅，可按 [LICENSE](LICENSE) 在本机编译和试用。Windows 安装包、校验值及使用教程通过 GitHub Releases 分发。安装包用户无需配置开发环境。
+[下载 Windows x64 安装包](https://github.com/jeromerlon99-svg/study-assistant-releases/releases/tag/v0.1.7) · [中英德使用教程 (PDF)](Study_Assistant_0.1.7_Tutorial_ZH_EN_DE.pdf) · [版本记录 / Changelog](CHANGELOG.md)
 
-## 0.1.7 已实现
+> “直心是道场，无虚伪故” ——《维摩诘经》。愿我们真诚。
 
-- 移除尚未投入使用的视频抽帧、视觉模型设置和视觉能力状态，不再让不可用的预留选项占用界面。
-- 主界面左上方新增与深绿色侧栏协调的 Buy Me a Coffee 捐赠卡片，链接到 `https://buymeacoffee.com/jeromerlon`。
-- 清理旧版本构建目录、测试临时数据、截图、日志和各类编译缓存；课程数据库、本地转写模型、语义模型与用户导出文件保留不动。
+## 中文
 
-## 0.1.6 已实现
+Study Assistant 是一款面向公开课的 Windows 桌面学习 AI Agent。添加课程链接后，它优先读取字幕，缺少字幕时在本机转写音频，再生成带时间戳的速学笔记。你可以按节查看和导出笔记，也可以就已处理的课程内容提问。
 
-- 双击启动程序后，先在屏幕中央显示 288×384 的独立苏醒开场动画；动画结束后再显示主窗口和常驻电子宠物。开场画面包含软件名、版本号和 `Dedicated to Xiaowei`，不再属于宠物运行状态。
-- 常驻宠物待命时显示微笑动画，课程处理期间自动切换为思考动画；折叠尺寸缩小为 92×114。猫咪身体支持原生窗口拖动，轻点仍会向左上展开当前任务信息板，显示任务、课程小节、处理阶段和进度，并可暂停/继续、打开主界面或隐藏宠物。
-- 电子宠物状态、任务板、按钮说明继续支持中、英、德三语，并跟随主程序语言设置。
+1. 在 [v0.1.7 预发布页](https://github.com/jeromerlon99-svg/study-assistant-releases/releases/tag/v0.1.7) 下载 **Study.Assistant_0.1.7_x64-setup.exe**，安装后打开应用。
+2. 在「智能能力设置」填写兼容服务的 API Base URL、API Key 和模型名称，保存并测试。每次完全退出后需重新填写 Key。
+3. 新建学习任务，添加课程链接并开始处理。首次需要本地转写或语义检索时，程序可能下载模型。
 
-## 0.1.5 已实现
+0.1.7 安装包尚未签名，Windows SmartScreen 可能提示「未知发布者」。应用源码已公开在 `main`，可按 [LICENSE](LICENSE) 查阅和本地编译试用。旧标签 `v0.1.7` 早于源码公开，所以该 Release 自动生成的源码压缩包只包含当时的 README。
 
-- 问答检索升级为真正的混合检索：SQLite FTS5 负责精确术语、代码名和原文命中，内置的 `intfloat/multilingual-e5-small` 负责同义改写、跨语言表达和没有共同关键词的问题；两路结果使用 Reciprocal Rank Fusion 合并后再交给文本模型回答。
-- 语义模型是程序固定能力，不再显示向量模型输入框，也不能在设置里关闭、更换或删除。首次启动 0.1.5 时自动下载经固定版本和 SHA-256 校验的本地 INT8 ONNX 模型，后续离线复用；模型推理、课程切块和向量索引全部在本机完成，不需要额外 API 或 Key。
-- 已有课程和新完成转写的课程都会按内容哈希增量建立索引；中断后只补建缺失或发生变化的课程。课程、任务删除时对应索引通过 SQLite 外键同步清理，共享模型文件保留。
-- 智能能力设置新增只读语义检索状态卡，显示模型下载、加载、索引进度、已索引课程数和失败原因。语义模型尚未就绪或初始化失败时，问答仍自动退化为原有词法检索，不阻断课程问答。
-- 数据库升级为 `user_version=5`，新增语义片段和课程索引状态表。首次从 0.1.4 启动时会先在 `runtime-data/backups/` 创建一致性备份，再原位迁移；现有任务、课程、转写、笔记和对话保持不变。
+如果它对你有帮助，欢迎 [请我喝杯咖啡](https://buymeacoffee.com/jeromerlon)，支持修复 bug 和维护项目。
 
-## 0.1.4 已实现
+## English
 
-- 课程音频出现“实际下载字节数少于预期”的不完整下载错误时，程序会删除当前课程专属目录内的 `course-audio.*` 残片，并自动从头重新下载一次。
-- 清理范围被限制在当前课程媒体目录和下载器专用文件名前缀，不删除字幕、笔记、数据库、课程元数据或其他课程文件。
-- 若干净重试后仍下载不完整，程序会再次清除残片并显示中文提示，用户检查网络后可继续任务，不会进入无限重试。
+Study Assistant is a Windows desktop AI agent for public online courses. Give it a course link to generate timestamped notes from captions or local audio transcription. Read and export notes by lesson, or ask questions across the lessons you have processed.
 
-## 0.1.3 已实现
+1. Download **Study.Assistant_0.1.7_x64-setup.exe** from the [v0.1.7 pre-release](https://github.com/jeromerlon99-svg/study-assistant-releases/releases/tag/v0.1.7), install it, and open the app.
+2. In **AI Settings**, enter your compatible provider’s API base URL, API key, and model name. Save and test the settings. Re-enter the key after each full exit.
+3. Create a learning task, add a course link, and start processing. The app may download local models the first time you use transcription or semantic search.
 
-- 课程问答收敛为唯一策略：先检索当前学习任务内所有已看课程的笔记和字幕；课程未覆盖时，由当前配置的文本模型使用其内部知识继续解释。
-- 模型知识补充必须与课程事实分开标注，并明确说明“不是课程内容、未经实时联网核实、可能过时或存在误差”；对时效性事实不得暗示已查询互联网。
-- 完全移除外部检索 API、Search Key、任务开关、检索调用和状态提示。现在只需配置一套文本模型 API，模型不会因此自动获得联网能力。
-- 数据库升级为 `user_version=4`。首次从 0.1.2 启动时会先创建 `study-assistant-0.1.2-*.db` 一致性备份，再清除旧任务的已停用外部检索标志；课程、笔记、转写和对话保持不变。
+The 0.1.7 pre-release installer is unsigned, so Windows SmartScreen may show an unknown publisher warning. The application source is available on `main` under [LICENSE](LICENSE), which permits inspection and local evaluation. The `v0.1.7` tag predates source publication, so its automatically generated archives contain the README from that point in time.
 
-## 0.1.2 已实现（历史）
+If Study Assistant helps you, [support the project](https://buymeacoffee.com/jeromerlon) to help fund bug fixes and maintenance.
 
-- 任务内课程默认显示为“第 1 节、第 2 节……”（英语、德语界面对应 `Lesson 1`、`Lektion 1`），并可逐节设置自定义名称或恢复默认名称；网页原始标题继续作为来源信息保存。
-- 课程问答右上角的三点按钮现在打开完整的对话管理器，可查看所有对话、切换、重命名、单独删除或清空当前任务的对话。
-- 问答检索由单次 SQLite FTS 查询升级为混合检索：先结合最近对话和课程目录生成短查询，再对字幕执行 FTS、中文子串/二至四字词组匹配和词法重排，并补入命中片段前后约 35 秒的上下文以及已生成的速学笔记。任务内所有已看课程仍是统一检索范围。
-- 中文无空格问题已专门处理；例如“ReAct是什么”会拆出 `ReAct`，不再把整句话当作一个无法命中的全文检索词。
-- “允许外部补充”现在有明确状态：未配置检索端点时不会制造已启用的假象，而是打开设置说明；检索失败、无结果或实际使用均由 Agent 返回结构化状态并在 UI 提示。外部检索仍需用户自行配置兼容 `results` JSON 的 HTTP 端点。
-- 数据库升级为 `user_version=3`，为课程增加 `custom_title`；首次由 0.1.1 启动 0.1.2 时会先在 `runtime-data/backups/` 创建一致性备份，再原位迁移，课程内容和对话不丢失。
+## Deutsch
 
-## 0.1.1 已实现
+Study Assistant ist ein KI-Agent für Windows, der beim Lernen mit öffentlichen Onlinekursen hilft. Gib einen Kurslink ein und erhalte Notizen mit Zeitmarken aus Untertiteln oder einer lokalen Audiotranskription. Du kannst Notizen pro Lektion lesen und exportieren oder Fragen zu den verarbeiteten Lektionen stellen.
 
-- 一个学习任务现在可包含多节公开课；课程目录按节显示状态、进度和笔记，每节可独立检查、处理、重新生成、导出和删除。添加窗口支持每行一个网址，并可解析播放列表后勾选要加入的小节。
-- 任务问答会检索该任务下所有已看课程，课程引用明确显示节次、课程标题和时间戳。
-- 提供“快速摘要 / 标准详解 / 深度研习”三套只读提示词。每套均有完整的中、英、德版本，用户可查看实际规则并按节选择；生成结果可包含 Markdown 表格和安全模式 Mermaid 图表。
-- UI 支持中文、English、Deutsch。主界面、设置与提示词弹窗、动态任务状态和独立状态浮窗会同步切换；浮窗会在运行中跟随主界面的语言设置。笔记语言选择“跟随软件语言”时，系统提示词、生成规则、笔记正文与标题也会使用对应语言；也可为某节课明确指定固定输出语言。
-- Windows 发布版的本地 Agent 使用无控制台模式，主程序启动本地进程时同时设置 `CREATE_NO_WINDOW`，不再弹出命令行窗口。
-- 首次打开 0.1.1 时会用 SQLite backup API 在 `runtime-data/backups/` 创建 0.1.0 一致性备份，再原位迁移数据库；任务、转写、笔记和对话均保留。
+1. Lade **Study.Assistant_0.1.7_x64-setup.exe** von der [Vorabversion v0.1.7](https://github.com/jeromerlon99-svg/study-assistant-releases/releases/tag/v0.1.7) herunter, installiere die App und öffne sie.
+2. Trage in den **KI-Einstellungen** die API-Basis-URL, den API-Schlüssel und den Modellnamen deines kompatiblen Anbieters ein. Speichere und teste die Einstellungen. Nach dem vollständigen Beenden musst du den Schlüssel erneut eingeben.
+3. Erstelle eine Lernaufgabe, füge einen Kurslink hinzu und starte die Verarbeitung. Für die erste Transkription oder semantische Suche lädt die App bei Bedarf lokale Modelle herunter.
 
-- 通过网址添加公开课，并在开始前给出 `READY`、`LIMITED`、`NEEDS_USER` 或 `UNSUPPORTED` 能力报告。
-- 优先读取官方/自动字幕；无字幕时使用本地 faster-whisper 处理音轨，首次按需下载模型，之后可离线复用。
-- 使用固定的课程学习提示词，先生成全课详细内容介绍，再按模块整理核心知识、讲解路线、例子、速记卡、易错点与自测；结果可追溯到课程时间戳并导出 Markdown。
-- 问答使用当前任务的课程记录，并在课程没有覆盖时由当前文本模型的内部知识补充；两者必须明确区分。
-- 每个任务独立保存课程来源、转写、速学笔记、对话和状态；添加网址时明确选择“新任务”或“继续旧任务”。任务管理支持重命名、用已有转写重新生成速学笔记和永久删除。
-- Tauri 主窗口、独立课程问答 UI、系统托盘，以及始终置顶的桌面电子宠物。
-- 中断恢复：应用重启后，未完成任务会进入 `PAUSED`，可人工继续；开发进度记录在 `docs/DEVELOPMENT_CHECKPOINT.md`。
-- 所有 API Key 只保存在当前运行进程的内存中；应用启动时清空，并删除旧版本曾写入操作系统凭据库的 Key。
-- 主窗口左下角和任务标题栏都提供 API 设置入口。未填写本次运行的 Key、或连接测试未通过时，开始记录、重新生成和提问会被明确拦截，不再静默生成基础摘录并标记成功。
+Das Installationsprogramm der Vorabversion 0.1.7 ist unsigniert. Windows SmartScreen kann deshalb einen unbekannten Herausgeber melden. Der Anwendungsquellcode steht unter [LICENSE](LICENSE) auf `main` zur Einsicht und zum lokalen Testen bereit. Der Tag `v0.1.7` stammt aus der Zeit vor der Veröffentlichung des Quellcodes. Seine automatisch erzeugten Archive enthalten die damalige README-Datei.
+
+Wenn dir Study Assistant hilft, kannst du [das Projekt unterstützen](https://buymeacoffee.com/jeromerlon) und so zu Fehlerbehebungen und Wartung beitragen.
 
 ## 当前能力边界
 
