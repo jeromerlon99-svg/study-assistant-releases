@@ -1,6 +1,8 @@
 # Study Assistant
 
-[中文](#中文) · [English](#english) · [Deutsch](#deutsch) · [开发与构建](#开发环境)
+[中文](#中文) · [English](#english) · [Deutsch](#deutsch)
+
+[中文完整说明](#当前能力边界) · [English guide](#english-guide) · [Deutsche Anleitung](#deutsche-anleitung)
 
 [下载 Windows x64 安装包](https://github.com/jeromerlon99-svg/study-assistant-releases/releases/tag/v0.1.7) · [中英德使用教程 (PDF)](Study_Assistant_0.1.7_Tutorial_ZH_EN_DE.pdf) · [版本记录 / Changelog](CHANGELOG.md)
 
@@ -23,24 +25,28 @@ Study Assistant 是一款面向公开课的 Windows 桌面学习 AI Agent。添�
 Study Assistant is a Windows desktop AI agent for public online courses. Give it a course link to generate timestamped notes from captions or local audio transcription. Read and export notes by lesson, or ask questions across the lessons you have processed.
 
 1. Download **Study.Assistant_0.1.7_x64-setup.exe** from the [v0.1.7 pre-release](https://github.com/jeromerlon99-svg/study-assistant-releases/releases/tag/v0.1.7), install it, and open the app.
-2. In **AI Settings**, enter your compatible provider’s API base URL, API key, and model name. Save and test the settings. Re-enter the key after each full exit.
+2. In **AI capability settings**, enter your compatible provider’s API base URL, API key, and model name. Save and test the settings. Re-enter the key after each full exit.
 3. Create a learning task, add a course link, and start processing. The app may download local models the first time you use transcription or semantic search.
 
 The 0.1.7 pre-release installer is unsigned, so Windows SmartScreen may show an unknown publisher warning. The application source is available on `main` under [LICENSE](LICENSE), which permits inspection and local evaluation. The `v0.1.7` tag predates source publication, so its automatically generated archives contain the README from that point in time.
 
 If Study Assistant helps you, [support the project](https://buymeacoffee.com/jeromerlon) to help fund bug fixes and maintenance.
 
+[Continue to the English guide](#english-guide) for limitations, API setup, development, and data storage.
+
 ## Deutsch
 
 Study Assistant ist ein KI-Agent für Windows, der beim Lernen mit öffentlichen Onlinekursen hilft. Gib einen Kurslink ein und erhalte Notizen mit Zeitmarken aus Untertiteln oder einer lokalen Audiotranskription. Du kannst Notizen pro Lektion lesen und exportieren oder Fragen zu den verarbeiteten Lektionen stellen.
 
 1. Lade **Study.Assistant_0.1.7_x64-setup.exe** von der [Vorabversion v0.1.7](https://github.com/jeromerlon99-svg/study-assistant-releases/releases/tag/v0.1.7) herunter, installiere die App und öffne sie.
-2. Trage in den **KI-Einstellungen** die API-Basis-URL, den API-Schlüssel und den Modellnamen deines kompatiblen Anbieters ein. Speichere und teste die Einstellungen. Nach dem vollständigen Beenden musst du den Schlüssel erneut eingeben.
+2. Trage unter **KI-Fähigkeiten** die API-Basis-URL, den API-Schlüssel und den Modellnamen deines kompatiblen Anbieters ein. Speichere und teste die Einstellungen. Nach dem vollständigen Beenden musst du den Schlüssel erneut eingeben.
 3. Erstelle eine Lernaufgabe, füge einen Kurslink hinzu und starte die Verarbeitung. Für die erste Transkription oder semantische Suche lädt die App bei Bedarf lokale Modelle herunter.
 
 Das Installationsprogramm der Vorabversion 0.1.7 ist unsigniert. Windows SmartScreen kann deshalb einen unbekannten Herausgeber melden. Der Anwendungsquellcode steht unter [LICENSE](LICENSE) auf `main` zur Einsicht und zum lokalen Testen bereit. Der Tag `v0.1.7` stammt aus der Zeit vor der Veröffentlichung des Quellcodes. Seine automatisch erzeugten Archive enthalten die damalige README-Datei.
 
 Wenn dir Study Assistant hilft, kannst du [das Projekt unterstützen](https://buymeacoffee.com/jeromerlon) und so zu Fehlerbehebungen und Wartung beitragen.
+
+Die [deutsche Anleitung](#deutsche-anleitung) erklärt die Funktionsgrenzen, die API-Einrichtung, die Entwicklung und den Speicherort der Daten.
 
 ## 当前能力边界
 
@@ -150,3 +156,219 @@ pnpm release:build
 早期开发版曾使用 `%LOCALAPPDATA%\StudyAssistant`。当前版本默认使用上面的 `runtime-data\` 规则。
 
 架构与状态机详见 [docs/ARCHITECTURE_ZH.md](./docs/ARCHITECTURE_ZH.md)，当前开发断点见 [docs/DEVELOPMENT_CHECKPOINT.md](./docs/DEVELOPMENT_CHECKPOINT.md)。
+
+## English guide
+
+### Current limitations
+
+- Study Assistant processes public content you are authorized to access. It does not bypass DRM, login requirements, paywalls, or access controls.
+- Version 0.1.7 uses captions or audio to understand a course. It does not analyze video frames, board writing, or slides. Visual model settings are unavailable in this version.
+- Local transcription uses CPU inference in `int8` mode. `small` is a good default. `medium` and `large-v3` can improve accuracy at the cost of larger downloads and slower transcription.
+- The text model provider must support `chat/completions`. faster-whisper decodes the audio on your device using the bundled PyAV library. No audio is sent to a cloud transcription API.
+- Course Q&A uses course records and the model’s existing knowledge. It does not use a live search engine or an external retrieval API. Check time-sensitive information separately.
+
+### Development environment
+
+Development requires Windows 10 or 11, Microsoft C++ Build Tools, the Windows SDK, the Rust MSVC toolchain, and WebView2. [environment.yml](./environment.yml) defines the Conda environment. Python package requirements are in `services/agent/pyproject.toml`, and Node dependencies are locked in `pnpm-lock.yaml`.
+
+```powershell
+conda env create -f environment.yml
+conda activate study-assistant
+pnpm install --frozen-lockfile
+```
+
+#### Run in development mode
+
+```powershell
+conda activate study-assistant
+pnpm tauri dev
+```
+
+Tauri development mode starts the Python Agent from the Conda environment and uses the FFmpeg provided by that environment. If the preferred port `8765` is in use, it chooses another available local port. To debug the frontend in a browser, run these commands in separate terminals:
+
+```powershell
+pnpm agent:dev
+pnpm dev
+```
+
+#### Configure the AI API
+
+Open **AI capability settings** in the lower-left corner of the main window and enter or select the following:
+
+- API Base URL
+- API key, kept in memory for the current session and required again after restart
+- Text model
+- Optional reasoning effort for Kimi K3. The default `low` balances speed and cost on long courses.
+- Local faster-whisper model (`small`, `medium`, or `large-v3`)
+
+Semantic search uses the built-in local model `intfloat/multilingual-e5-small`. The app downloads it automatically on first startup and then keeps the index up to date for all transcribed lessons. Settings show the model status without controls to disable, replace, or remove the model. See [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) for the model source, pinned artifact version, license, and checksum.
+
+Saving the settings sends a test request to the provider. The app sends course text to the configured text model provider when it generates notes or answers questions. If the model or session key is missing, or the test fails, the app prompts you to fix the settings before it can generate notes or answer questions.
+
+After a full restart, open **Configure API**, enter your key, and check that the connection test passes. Existing transcripts stay on your device. You can regenerate notes from **Manage task** without downloading or transcribing the lesson again.
+
+##### Kimi K3 configuration
+
+- API Base URL. Use the address your account provides. The international endpoint is `https://api.moonshot.ai/v1`.
+- Text model. Enter `kimi-k3`.
+- Reasoning effort. Start with `low` and switch to `high` or `max` if you need deeper reasoning.
+- Local transcription model. Start with `small`. Transcription runs independently of the Kimi API.
+
+For `kimi-k3`, the app sends `max_completion_tokens` and `reasoning_effort` and omits the unsupported `temperature` parameter. For lessons without captions, local faster-whisper handles transcription without an extra API or key. See the [Kimi K3 quickstart](https://platform.kimi.ai/docs/guide/kimi-k3-quickstart) and [faster-whisper documentation](https://github.com/SYSTRAN/faster-whisper).
+
+The Kimi K3 connection test waits up to 120 seconds. Longer generation requests, such as course notes, wait up to 600 seconds. The app continues as soon as the model responds. If a request times out, the app reports the timeout and keeps the completed transcript so you can regenerate the notes later.
+
+##### Local transcription models
+
+- The app uses readable captions when available and downloads a Whisper model only when needed for local transcription.
+- The first time you process a lesson without captions, the app downloads the selected model to `runtime-data\models\faster-whisper\<model-name>\`.
+- The downloaded model can be reused for offline transcription. To free space, delete the corresponding model directory.
+- If the download fails, the app keeps the error and task progress. Check your network connection or disk space before resuming.
+
+#### Checks and cleanup
+
+Keep the regression-test source in `tests/`. The app’s test reports, temporary databases, screenshots, logs, build caches, and PyInstaller working files go in `development-artifacts/`, which can be deleted as a whole.
+
+```powershell
+pnpm check
+```
+
+This command runs version and Python dependency checks, Ruff, pytest, the production frontend build, Rust formatting checks, and Clippy. Installer creation is a separate step.
+
+#### Build the Windows installer
+
+```powershell
+pnpm release:build
+```
+
+This command packages the Python Agent, downloads and verifies the pinned LGPL FFmpeg and FFprobe binaries, then builds a single-file NSIS installer with the release configuration. The output is in `apps/desktop/src-tauri/target/release/bundle/nsis/`, or under `release/bundle/nsis/` in your configured `CARGO_TARGET_DIR`. Attach the EXE and tutorial to a GitHub Release when distributing them.
+
+If the pinned FFmpeg build is withdrawn upstream, put the original ZIP with the same filename and SHA-256 in `development-artifacts/ffmpeg/` before retrying. When updating the pinned build, update the checksum and [third-party notices](THIRD_PARTY_NOTICES.md) together.
+
+### Data storage
+
+The app keeps its runtime data and exports in `runtime-data\`. When it runs from the source repository or its `preview-builds` directory, it uses the folder at the repository root. A portable executable kept elsewhere uses a `runtime-data\` folder next to the executable. Override this location with `STUDY_ASSISTANT_DATA_DIR`.
+
+- `study-assistant.db` stores each task’s data separately in SQLite.
+- `media/` stores course audio downloaded when needed.
+- `exports/` stores Markdown exports.
+- `models/faster-whisper/` stores local transcription models downloaded for reuse.
+- `models/embedding/multilingual-e5-small/` stores the built-in multilingual semantic model, downloaded and verified automatically.
+- `provider.json` stores non-secret model names and endpoints.
+- `preferences.json` stores non-secret preferences such as the interface language.
+- `backups/` stores consistent database backups created before migrations.
+- `agent.log` is the local Agent log for release builds.
+
+Deleting a learning task removes its database records, cached media, exports, and semantic index. Shared Whisper and E5 model files stay available for other tasks. The API key stays in memory for the session. The app does not write it to disk, the system credential store, or logs.
+
+Earlier development builds used `%LOCALAPPDATA%\StudyAssistant`. The current default follows the `runtime-data\` rules above.
+
+See the [architecture and state machine](./docs/ARCHITECTURE_ZH.md) and the [development checkpoint](./docs/DEVELOPMENT_CHECKPOINT.md) for more detail. Both documents are in Chinese.
+
+## Deutsche Anleitung
+
+### Aktuelle Funktionsgrenzen
+
+- Study Assistant verarbeitet öffentliche Inhalte, auf die du zugreifen darfst. Die App umgeht weder DRM noch Anmeldepflichten, Bezahlschranken oder andere Zugriffsbeschränkungen.
+- Version 0.1.7 wertet Untertitel oder die Tonspur eines Kurses aus. Videobilder, Tafelanschriften und Folien werden nicht analysiert. Einstellungen für Bildmodelle sind in dieser Version nicht verfügbar.
+- Die lokale Transkription läuft auf der CPU im `int8`-Modus. `small` eignet sich als Standardeinstellung. `medium` und `large-v3` können genauer transkribieren, benötigen aber größere Downloads und mehr Rechenzeit.
+- Der Anbieter des Textmodells muss `chat/completions` unterstützen. faster-whisper dekodiert den Ton lokal mit der mitgelieferten PyAV-Bibliothek. Die App sendet keine Audiodaten an eine Cloud-Transkriptions-API.
+- Bei Kursfragen nutzt die App die Kursaufzeichnungen und das vorhandene Modellwissen. Sie verwendet keine Live-Websuche und keine externe Such-API. Prüfe zeitabhängige Angaben bei Bedarf separat.
+
+### Entwicklungsumgebung
+
+Für die Entwicklung brauchst du Windows 10 oder 11, die Microsoft C++ Build Tools, das Windows SDK, die Rust-Toolchain für MSVC und WebView2. [environment.yml](./environment.yml) definiert die Conda-Umgebung. Die Python-Paketanforderungen stehen in `services/agent/pyproject.toml`. Die Node-Abhängigkeiten sind in `pnpm-lock.yaml` festgeschrieben.
+
+```powershell
+conda env create -f environment.yml
+conda activate study-assistant
+pnpm install --frozen-lockfile
+```
+
+#### Im Entwicklungsmodus starten
+
+```powershell
+conda activate study-assistant
+pnpm tauri dev
+```
+
+Im Entwicklungsmodus startet Tauri den Python-Agenten aus der Conda-Umgebung und verwendet das dort installierte FFmpeg. Ist der bevorzugte Port `8765` belegt, wird ein anderer freier lokaler Port gewählt. Um die Oberfläche im Browser zu testen, führe diese Befehle in getrennten Terminals aus:
+
+```powershell
+pnpm agent:dev
+pnpm dev
+```
+
+#### KI-API einrichten
+
+Öffne unten links im Hauptfenster **KI-Fähigkeiten**. Dort kannst du Folgendes eingeben oder auswählen:
+
+- API-Basis-URL
+- API-Schlüssel, der für die aktuelle Sitzung im Arbeitsspeicher bleibt und nach dem Neustart erneut eingegeben werden muss
+- Textmodell
+- Optionaler Reasoning-Aufwand für Kimi K3. Die Standardeinstellung `low` hält bei langen Kursen Rechenzeit und Kosten niedrig.
+- Lokales faster-whisper-Modell (`small`, `medium` oder `large-v3`)
+
+Die semantische Suche verwendet das integrierte lokale Modell `intfloat/multilingual-e5-small`. Die App lädt es beim ersten Start automatisch herunter und hält danach den Suchindex für alle transkribierten Lektionen aktuell. Die Einstellungen zeigen den Modellstatus an. Das Modell lässt sich dort weder deaktivieren noch austauschen oder entfernen. Quelle, festgelegte Version, Lizenz und Prüfsumme stehen in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+
+Beim Speichern sendet die App eine Testanfrage an den Anbieter. Beim Erstellen von Notizen und Beantworten von Fragen übermittelt sie Kurstext an den eingerichteten Textmodellanbieter. Fehlt das Modell oder der aktuelle API-Schlüssel oder schlägt der Test fehl, fordert die App dich auf, die Einstellungen zu korrigieren.
+
+Öffne nach einem vollständigen Neustart **API konfigurieren**, gib deinen Schlüssel ein und prüfe, ob der Verbindungstest erfolgreich ist. Vorhandene Transkripte bleiben auf deinem Gerät. Über **Aufgabe verwalten** kannst du Notizen mit diesen Transkripten neu erstellen.
+
+##### Kimi K3 einrichten
+
+- API-Basis-URL. Verwende die Adresse aus deinem Kimi-Konto. Der internationale Endpunkt lautet `https://api.moonshot.ai/v1`.
+- Textmodell. Gib `kimi-k3` ein.
+- Reasoning-Aufwand. Beginne mit `low`. Für komplexere Aufgaben kannst du `high` oder `max` wählen.
+- Lokales Transkriptionsmodell. Beginne mit `small`. Die Transkription läuft unabhängig von der Kimi-API.
+
+Für `kimi-k3` sendet die App `max_completion_tokens` und `reasoning_effort`. Der nicht unterstützte Parameter `temperature` wird weggelassen. Bei Lektionen ohne Untertitel übernimmt faster-whisper die lokale Transkription ohne weitere API und ohne zusätzlichen Schlüssel. Siehe die [Kimi-K3-Kurzanleitung](https://platform.kimi.ai/docs/guide/kimi-k3-quickstart) und die [faster-whisper-Dokumentation](https://github.com/SYSTRAN/faster-whisper).
+
+Der Kimi-K3-Verbindungstest wartet bis zu 120 Sekunden. Für längere Anfragen wie das Erstellen von Kursnotizen wartet die App bis zu 600 Sekunden. Sobald das Modell antwortet, setzt sie die Verarbeitung fort. Bei einer Zeitüberschreitung zeigt sie eine Meldung an und behält das fertige Transkript, damit du später erneut Notizen erstellen kannst.
+
+##### Lokale Transkriptionsmodelle
+
+- Wenn lesbare Untertitel vorliegen, verwendet die App diese. Ein Whisper-Modell wird erst heruntergeladen, wenn eine lokale Transkription nötig ist.
+- Beim ersten Verarbeiten einer Lektion ohne Untertitel wird das ausgewählte Modell nach `runtime-data\models\faster-whisper\<Modellname>\` heruntergeladen.
+- Das heruntergeladene Modell kann für die Offline-Transkription wiederverwendet werden. Um Speicherplatz freizugeben, kannst du das zugehörige Modellverzeichnis löschen.
+- Schlägt der Download fehl, bleiben die Fehlermeldung und der bisherige Aufgabenfortschritt erhalten. Prüfe die Internetverbindung oder den freien Speicherplatz vor dem Fortsetzen.
+
+#### Prüfungen und Bereinigung
+
+Der Quellcode der Regressionstests gehört in `tests/` und bleibt im Repository. Testberichte, temporäre Datenbanken, Bildschirmfotos, Protokolle, Build-Caches und PyInstaller-Arbeitsdateien liegen in `development-artifacts/`. Dieses Verzeichnis lässt sich vollständig löschen.
+
+```powershell
+pnpm check
+```
+
+Der Befehl prüft die Versionsangaben und Python-Abhängigkeiten und führt Ruff, pytest, den Produktions-Build der Oberfläche, die Rust-Formatprüfung und Clippy aus. Das Erstellen des Installationsprogramms ist ein separater Schritt.
+
+#### Windows-Installationsprogramm bauen
+
+```powershell
+pnpm release:build
+```
+
+Der Befehl verpackt den Python-Agenten, lädt die festgelegten LGPL-Versionen von FFmpeg und FFprobe herunter und prüft deren Integrität. Anschließend baut er mit der Release-Konfiguration ein NSIS-Installationsprogramm als einzelne Datei. Die Ausgabe liegt in `apps/desktop/src-tauri/target/release/bundle/nsis/` oder unter `release/bundle/nsis/` im konfigurierten `CARGO_TARGET_DIR`. Zur Veröffentlichung kannst du die EXE und die Anleitung als Anhänge zu einem GitHub Release hinzufügen.
+
+Falls der festgelegte FFmpeg-Build beim Anbieter nicht mehr verfügbar ist, lege vor dem erneuten Versuch die ursprüngliche ZIP-Datei mit unverändertem Namen und identischer SHA-256-Prüfsumme in `development-artifacts/ffmpeg/` ab. Aktualisiere bei einem Versionswechsel sowohl die Prüfsumme als auch die [Hinweise zu Drittkomponenten](THIRD_PARTY_NOTICES.md).
+
+### Speicherort der Daten
+
+Die App speichert Laufzeitdaten und Exporte in `runtime-data\`. Startest du sie aus dem Quellcode-Repository oder dessen Unterordner `preview-builds`, verwendet sie das Verzeichnis am Repository-Stamm. Eine portable Programmdatei an einem anderen Ort verwendet ein `runtime-data\`-Verzeichnis neben der Programmdatei. Mit `STUDY_ASSISTANT_DATA_DIR` kannst du diesen Speicherort überschreiben.
+
+- `study-assistant.db` speichert die Daten jeder Aufgabe getrennt in einer SQLite-Datenbank.
+- `media/` enthält bei Bedarf heruntergeladene Kurstonspuren.
+- `exports/` enthält Markdown-Exporte.
+- `models/faster-whisper/` enthält heruntergeladene lokale Transkriptionsmodelle zur Wiederverwendung.
+- `models/embedding/multilingual-e5-small/` enthält das integrierte mehrsprachige Suchmodell, das die App automatisch herunterlädt und überprüft.
+- `provider.json` enthält nicht vertrauliche Modellnamen und Endpunkte.
+- `preferences.json` enthält nicht vertrauliche Einstellungen wie die Sprache der Oberfläche.
+- `backups/` enthält konsistente Datenbanksicherungen, die vor Migrationen erstellt werden.
+- `agent.log` enthält das lokale Protokoll des Agenten in Release-Builds.
+
+Beim Löschen einer Lernaufgabe entfernt die App deren Datenbankeinträge, zwischengespeicherte Medien, Exporte und Suchindex. Gemeinsam genutzte Whisper- und E5-Modelle bleiben für andere Aufgaben verfügbar. Der API-Schlüssel bleibt für die Sitzung im Arbeitsspeicher. Die App schreibt ihn weder auf den Datenträger noch in die Anmeldeinformationsverwaltung oder in Protokolle.
+
+Ältere Entwicklungsversionen nutzten `%LOCALAPPDATA%\StudyAssistant`. Heute gilt standardmäßig die oben beschriebene Regel für `runtime-data\`.
+
+Weitere Details findest du unter [Architektur und Zustandsmodell](./docs/ARCHITECTURE_ZH.md) und [Entwicklungsstand](./docs/DEVELOPMENT_CHECKPOINT.md). Beide Dokumente sind auf Chinesisch.
